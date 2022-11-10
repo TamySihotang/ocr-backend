@@ -1,0 +1,160 @@
+server:
+  port: 7011
+  url: ${url.server}/login
+
+spring:
+  application:
+    name: rekening-koran
+  cloud:
+    config:
+      uri: ${url.cloud-config}
+  main:
+    allow-bean-definition-overriding: true
+  rabbitmq:
+    listener:
+      simple:
+        missing-queues-fatal: true
+  messages:
+    basename: messages/messages
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+management:
+  security:
+    enabled: false
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${url.eureka}/eureka/
+
+# oauth
+oauth2:
+  tokenUrl: ${url.oauth-server}/login
+  checkTokenUrl: ${url.oauth-server}/oauth/check_token
+  client-id: fgc
+  client-secret: secret
+  client-scope: read,write
+  client-password: password
+  client-refresh-token: refresh_token
+
+exclude:
+  uris: /v2/api-docs,/ping,
+  wildcards: swagger,favicon,login,menu,user,setting,lookup,profile,branch,member
+
+swagger:
+  url: ${url.swagger}
+
+logging:
+  config: config/logback-release.xml
+
+
+
+---
+spring:
+  profiles: localhost
+  datasource:
+    url: jdbc:postgresql://34.101.176.117:5432/ocrdb
+    driver-class-name: org.postgresql.Driver
+    username: friscasagala9
+    password: ocr123
+    jpa:
+      show-sql: false
+      hibernate:
+        ddl-auto: update
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+url:
+  server: http://localhost:7011
+#  eureka: http://localhost:8761
+#  zipkin: http://fgc-zipkin-fgc-test.apps.ocp.fifgroup.co.id/
+#  cloud-config: http://localhost:8888
+#  oauth-server: http://localhost:7000
+  swagger: http://localhost:7011
+
+---
+#Database Postgres
+spring:
+  profiles: development
+  datasource:
+    url: jdbc:postgresql://34.101.176.117:5432/ocrdb
+    driver-class-name: org.postgresql.Driver
+    username: friscasagala9
+    password: ocr123
+    jpa:
+      show-sql: false
+      hibernate:
+        ddl-auto: update
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+      hikari:
+        connectionTimeout: 120000
+        idleTimeout: 120000
+        maxLifetime: 240000
+        maximumPoolSize: 20
+        minimumIdle: 5
+
+url:
+  server: http://danamon-ocr.co.id
+#  eureka: http://fgc-discovery-server-fgc.apps.ocpnp.fifgroup.co.id
+#  zipkin: http://fgc-zipkin-fgc.apps.ocpnp.fifgroup.co.id
+#  cloud-config: http://fgc-cloud-config-server-fgc.apps.ocpnp.fifgroup.co.id
+#  oauth-server: http://fgc-spring-cloud-fgc.apps.ocpnp.fifgroup.co.id
+  swagger: http://danamon-ocr.co.id
+#  minio: https://fgc-minio-fgc.fifgroup.co.id
+#  middle: http://fgc-middle-fgc.apps.ocpnp.fifgroup.co.id
+#  verifikasi-email-trx: https://fgc-webview-membership-fgc.fifgroup.co.id/email-verification?
+#mail:
+#  support: admin.uvp@fifgroup.astra.co.id
+#  ws:
+#    url: http://wstest.fifgroup.co.id/ewsemail/sendemail
+#    fromCustomer: apptest
+#    nameCustomer: FIONA - FIFGROUP
+#    passwordCustomer: 12345678Aa
+#
+#    fromEmployee: apptest
+#    nameEmployee: Admin FIFGROUP Card
+#    passwordEmployee: 12345678Aa
+#wa:
+#  username: 3ve69qivc73fdi4sqon0nr68re
+#  password: k2n13n0udcio4h7jeddh2e8d6lbrq62egu45d9ntc9ngfgrd4eb
+#  login: https://ish.astra.co.id/sandbox/whatsapp/v1/users/login
+#  check: https://ish.astra.co.id/sandbox/whatsapp/v1/contacts/
+#  send: https://ish.astra.co.id/sandbox/whatsapp/v1/messages/
+#  credentials: NWJ2cGZtN2NwaG5oaXNkcmMxcGVtb2ZoMHY6bXFnODhlbTd0cXV0djJkNzZidDJ1cGpkcTVpNDBoYXBwNDRkajRzaTFlZW12cjFnMWxp
+#  namespace: bccdfead_c6d5_49f9_8e62_7ef6f6fee036
+---
+spring:
+  profiles: staging
+  datasource:
+    url: jdbc:postgresql://34.101.176.117:5432/ocrdb
+    driver-class-name: org.postgresql.Driver
+    username: friscasagala9
+    password: ocr123
+    jpa:
+      show-sql: false
+      hibernate:
+        ddl-auto: update
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+      hikari:
+        connectionTimeout: 120000
+        idleTimeout: 120000
+        maxLifetime: 240000
+        maximumPoolSize: 20
+        minimumIdle: 5
+
+url:
+  server: http://danamon-ocr.co.id
+#  eureka: http://fgc-discovery-server-fgc-test.apps.ocpnp.fifgroup.co.id
+#  zipkin: http://fgc-zipkin-fgc-test.apps.ocpnp.fifgroup.co.id
+#  cloud-config: http://fgc-cloud-config-server-fgc-test.apps.ocpnp.fifgroup.co.id
+#  oauth-server: http://fgc-spring-cloud-fgc-test.apps.ocpnp.fifgroup.co.id
+  swagger: http://danamon-ocr.co.id
+
+---
+
