@@ -4,6 +4,7 @@ import com.danamon.enums.Bank;
 import com.danamon.service.RekeningKoranService;
 import com.danamon.vo.ResultVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Set;
 
 @RestController
@@ -24,15 +26,9 @@ public class RekeningKoranController {
         this.rekeningKoranService = rekeningKoranService;
     }
 
-    @PostMapping("/upload")
+    @PostMapping(value = "/upload", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ResultVO> uploadFile(@RequestParam("file") Set<MultipartFile> file,
-                                               @RequestParam(value = "bank") Bank bank) {
-        AbstractRequestHandler handler = new AbstractRequestHandler() {
-            @Override
-            public Object processRequest() {
-                return rekeningKoranService.convertReportRekening(bank, file);
-            }
-        };
-        return handler.getResult();
+                                               @RequestParam(value = "bank") Bank bank) throws IOException{
+        return rekeningKoranService.convertReportRekening(bank, file);
     }
 }

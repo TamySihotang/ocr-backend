@@ -97,7 +97,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public String constructByteArrayExcel(List<SheetNameEnum> sheetNames, List<TransactionHeader> transactionHeaders, List<TransactionDetail> transactionDetailList) {
+    public ByteArrayInputStream constructByteArrayExcel(List<SheetNameEnum> sheetNames, List<TransactionHeader> transactionHeaders, List<TransactionDetail> transactionDetailList) {
         Workbook workbook = new XSSFWorkbook();
         sheetNames.forEach(sheetNameEnum -> workbook.createSheet(sheetNameEnum.getInternalValue()));
         String filePath = "Files-upload/Report.xlsx";
@@ -158,16 +158,20 @@ public class FileServiceImpl implements FileService {
                 }
             }
 
-            FileOutputStream out = new FileOutputStream(
-                    new File(filePath));
+//            FileOutputStream out = new FileOutputStream(
+//                    new File(filePath));
 
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
             workbook.write(out);
             workbook.close();
             out.close();
+            return new ByteArrayInputStream(out.toByteArray());
         } catch (IOException e) {
             log.error("error crete excel :: {}", e.getMessage());
+            return null;
         } catch (ApplicationException ae) {
             log.error("error to validate setup data :: {}", ae.getMessage());
+            return null;
         } finally {
             try {
                 workbook.close();
@@ -175,8 +179,8 @@ public class FileServiceImpl implements FileService {
                 e.printStackTrace();
             }
         }
-        Path uploadDirectory = Paths.get(filePath);
-        return uploadDirectory.getFileName().toString();
+//        Path uploadDirectory = Paths.get(filePath);
+//        return uploadDirectory.getFileName().toString();
     }
 
     private void autoSizeColumns(Sheet sheet, int n) {

@@ -3,7 +3,7 @@
 
     <property name="LOG_PATH" value="logs"/>
     <property name="ARCHIVED_PATH" value="archived-logs"/>
-    <property name="FILENAME" value="fgc-transaction-ufi"/>
+    <property name="FILENAME" value="danamon-ocr"/>
     <property name="FILE_LOG_PATTERN"
               value="%d{HH:mm:ss.SSS} %green([%thread]) %highlight(%-5level) %logger{36} - %msg%n"/>
 

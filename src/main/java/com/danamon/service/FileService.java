@@ -6,11 +6,12 @@ import com.danamon.persistence.domain.TransactionHeader;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 
+import java.io.ByteArrayInputStream;
 import java.util.List;
 import java.util.Set;
 
 public interface FileService {
     Set<String>  convertPdfToExcel(Set<MultipartFile> file);
     List<XSSFSheet> readFileExcel(String urlfile);
-    String constructByteArrayExcel(List<SheetNameEnum> sheetName, List<TransactionHeader> transactionHeaders, List<TransactionDetail> transactionDetailList);
+    ByteArrayInputStream constructByteArrayExcel(List<SheetNameEnum> sheetName, List<TransactionHeader> transactionHeaders, List<TransactionDetail> transactionDetailList);
 }

@@ -21,7 +21,8 @@ public class ResourceConfig extends WebSecurityConfigurerAdapter{
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.cors().and().csrf().disable();
+        http
+                .csrf().disable();
 
         // (optional) Send a 401 message to the browser (w/o this, you'll see a blank page)
 //        Okta.configureResourceServer401ResponseBody(http);
