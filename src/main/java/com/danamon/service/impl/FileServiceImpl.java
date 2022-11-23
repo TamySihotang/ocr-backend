@@ -1,6 +1,7 @@
 package com.danamon.service.impl;
 
 import com.danamon.enums.SheetNameEnum;
+import com.danamon.enums.StatusCode;
 import com.danamon.exception.ApplicationException;
 import com.danamon.persistence.domain.TransactionDetail;
 import com.danamon.persistence.domain.TransactionHeader;
@@ -64,6 +65,7 @@ public class FileServiceImpl implements FileService {
                 fileNameExcel.add(nameExcel);
             } catch (Exception e) {
                 e.printStackTrace();
+                throw new ApplicationException("failed to convert file", StatusCode.ERROR);
             }
         });
         return fileNameExcel;

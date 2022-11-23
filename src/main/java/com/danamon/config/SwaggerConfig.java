@@ -24,7 +24,7 @@ import java.util.List;
 //@Profile({"development", "staging"})
 public class SwaggerConfig {
 
-    private static final Contact DEFAULT_CONTACT = new Contact("Nostra Solution", "https://www.nostratech.com/", "nostra.admin@nostratech.com");
+    private static final Contact DEFAULT_CONTACT = new Contact("OCR DANAMON", "https://www.danamon.com/", "sihotangtamy@gmail.com");
 
     @Value("${swagger.url}")
     private String swaggerHost;
@@ -54,7 +54,7 @@ public class SwaggerConfig {
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("FGC Transaction NMC Service")
+                .title("OCR Service")
                 .description("API")
                 .contact(DEFAULT_CONTACT)
                 .version("1.0.0")
