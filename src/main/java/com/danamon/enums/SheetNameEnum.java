@@ -2,6 +2,7 @@ package com.danamon.enums;
 
 public enum SheetNameEnum implements BaseEnum<String>{
     SUMMARY_OF_BS_ANALYSIS("Summary of BS Analysis"),
+    TRANSACTION_DETAIL("Transaction Detail"),
     WINDOW_DRESSING("Window Dressing"),
     TRANSACTIOM_REKENING("Transaction rekening1"),
     EOD_BALANCE("EOD Balances1"),

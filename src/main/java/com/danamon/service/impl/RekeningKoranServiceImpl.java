@@ -13,6 +13,7 @@ import com.danamon.service.RekeningKoranService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -68,7 +69,10 @@ public class RekeningKoranServiceImpl implements RekeningKoranService {
 
     private ByteArrayInputStream generateReport(List<TransactionHeader> transactionHeaderList){
         List<SheetNameEnum> sheetName = Arrays.asList(SheetNameEnum.values());
-        List<TransactionDetail> transactionDetailList = transactionDetailRepository.findByTransactionHeaderIn(transactionHeaderList);
+        List<Sort.Order> orders = new ArrayList<>();
+        orders.add(new Sort.Order(Sort.Direction.ASC, "tanggalTransaksi"));
+        orders.add(new Sort.Order(Sort.Direction.ASC, "creationDate"));
+        List<TransactionDetail> transactionDetailList = transactionDetailRepository.findByTransactionHeaderIn(transactionHeaderList, Sort.by(orders));
         return fileService.constructByteArrayExcel(sheetName, transactionHeaderList, transactionDetailList);
     }
 }

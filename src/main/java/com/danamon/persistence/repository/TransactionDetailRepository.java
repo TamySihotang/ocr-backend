@@ -2,6 +2,7 @@ package com.danamon.persistence.repository;
 
 import com.danamon.persistence.domain.TransactionDetail;
 import com.danamon.persistence.domain.TransactionHeader;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,5 +20,5 @@ public interface TransactionDetailRepository extends BaseWithoutIdRepository<Tra
     List<TransactionDetail> findByTransactionHeaderAndKeteranganIn(TransactionHeader transactionHeader, List<String> keterangan);
     List<TransactionDetail> findByTransactionHeader(TransactionHeader transactionHeader);
 
-    List<TransactionDetail> findByTransactionHeaderIn(List<TransactionHeader> transactionHeaderList);
+    List<TransactionDetail> findByTransactionHeaderIn(List<TransactionHeader> transactionHeaderList, Sort sort);
 }

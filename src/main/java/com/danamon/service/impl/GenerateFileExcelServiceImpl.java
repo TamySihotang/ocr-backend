@@ -11,9 +11,11 @@ import com.danamon.utils.DateUtil;
 import com.danamon.vo.DetailInformationVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -506,6 +508,52 @@ public class GenerateFileExcelServiceImpl implements GenerateFileExcelService {
     }
 
     @Override
+    public void generateTransactionDetail(Sheet sheet, List<TransactionDetail> transactionDetails, Workbook workbook) {
+        headerSheetTransactionDetail(sheet);
+        valueSheetTransactionDetail(sheet, transactionDetails, workbook);
+    }
+
+    private Row headerSheetTransactionDetail(Sheet sheet) {
+        Row header = sheet.createRow(0);
+        header.createCell(0, 1).setCellValue("Tanggal");
+        header.createCell(1, 1).setCellValue("Keterangan");
+        header.createCell(2, 1).setCellValue("Cbg");
+        header.createCell(3, 1).setCellValue("Debet");
+        header.createCell(4, 1).setCellValue("Kredit");
+        header.createCell(5, 1).setCellValue("Saldo");
+        header.createCell(6, 1).setCellValue("Klasifikasi 1");
+        header.createCell(7, 1).setCellValue("Klasifikasi 2");
+        return header;
+    }
+
+    private void valueSheetTransactionDetail(Sheet sheet, List<TransactionDetail> transactionDetailList, Workbook workbook) {
+        int firstRow = 1;
+        DataFormat format = workbook.createDataFormat();
+        CellStyle styleNumber = workbook.createCellStyle();
+        styleNumber.setDataFormat(format.getFormat("#,##0.00"));
+
+        for (TransactionDetail transactionDetail : transactionDetailList) {
+            Row row = sheet.createRow(firstRow);
+            Cell tanggalCell = row.createCell(0, 1);
+            tanggalCell.setCellValue(DateUtil.formatDateToString(transactionDetail.getTanggalTransaksi(), DateUtil.DATE_PATTERN2));
+            Cell keteranganCell = row.createCell(1, 1);
+            keteranganCell.setCellValue(transactionDetail.getKeterangan() == null ? "" : transactionDetail.getKeterangan().replace("|"," "));
+            Cell cbgCell = row.createCell(2, 1);
+            if(transactionDetail.getCbg() != null) cbgCell.setCellValue(transactionDetail.getCbg());
+            Cell debetCell = row.createCell(3, 1);
+            debetCell.setCellStyle(styleNumber);
+            if(transactionDetail.getDebet() != null) debetCell.setCellValue(Long.valueOf(transactionDetail.getDebet().longValue()));
+            Cell kreditCell = row.createCell(4, 1);
+            kreditCell.setCellStyle(styleNumber);
+            if(transactionDetail.getKredit() != null) kreditCell.setCellValue(Long.valueOf(transactionDetail.getKredit().longValue()));
+            Cell saldoCell = row.createCell(5, 1);
+            saldoCell.setCellStyle(styleNumber);
+            if(transactionDetail.getSaldo() != null) saldoCell.setCellValue(Long.valueOf(transactionDetail.getSaldo().longValue()));
+            firstRow += 1;
+        }
+    }
+
+    @Override
     public void generateSheetTop20Fund(List<TransactionHeader> transactionHeaders, List<TransactionDetail> transactionDetailList, Sheet sheet, Workbook workbook) {
         CellStyle style = workbook.createCellStyle();
         Font font = workbook.createFont();
@@ -572,10 +620,10 @@ public class GenerateFileExcelServiceImpl implements GenerateFileExcelService {
             });
 
 
-
         });
     }
-    private Cell createCell(Row row){
+
+    private Cell createCell(Row row) {
         return row.createCell(row.getLastCellNum() < 0 ? 0 : row.getLastCellNum());
     }
 }

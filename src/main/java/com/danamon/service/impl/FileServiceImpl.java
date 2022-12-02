@@ -12,6 +12,7 @@ import com.spire.pdf.PdfDocument;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +109,10 @@ public class FileServiceImpl implements FileService {
             for (int i = 0; i< workbook.getNumberOfSheets(); i++){
                 if(workbook.getSheetAt(i).getSheetName().equalsIgnoreCase(SheetNameEnum.SUMMARY_OF_BS_ANALYSIS.getInternalValue())){
                     generateFileExcelService.generateSheetSummaryAnalysisValue(transactionHeaders, workbook.getSheetAt(i), workbook, transactionDetailList);
+                    autoSizeColumns(workbook.getSheetAt(i), 20);
+                }
+                if(workbook.getSheetAt(i).getSheetName().equalsIgnoreCase(SheetNameEnum.TRANSACTION_DETAIL.getInternalValue())){
+                    generateFileExcelService.generateTransactionDetail(workbook.getSheetAt(i),transactionDetailList, workbook);
                     autoSizeColumns(workbook.getSheetAt(i), 20);
                 }
                 if(workbook.getSheetAt(i).getSheetName().equalsIgnoreCase(SheetNameEnum.WINDOW_DRESSING.getInternalValue())){
