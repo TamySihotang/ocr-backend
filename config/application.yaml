@@ -103,10 +103,14 @@ url:
 spring:
   profiles: staging
   datasource:
-    url: jdbc:postgresql://34.101.176.117:5432/ocrdb
+#    url: jdbc:postgresql://34.101.176.117:5432/ocrdb
+#    driver-class-name: org.postgresql.Driver
+#    username: friscasagala9
+#    password: ocr123
+    url: jdbc:postgresql://localhost:5432/report_rekening_koran
     driver-class-name: org.postgresql.Driver
-    username: friscasagala9
-    password: ocr123
+    username: postgres
+    password: root
     type: org.apache.tomcat.jdbc.pool.DataSource
     jpa:
       show-sql: false

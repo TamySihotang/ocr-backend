@@ -2,37 +2,55 @@ package com.danamon.service.impl;
 
 import com.danamon.enums.CustomerInformationEnum;
 import com.danamon.enums.DetailInformationEnum;
+import com.danamon.persistence.domain.Company;
 import com.danamon.persistence.domain.CustomerInformation;
 import com.danamon.persistence.domain.TransactionDetail;
 import com.danamon.persistence.domain.TransactionHeader;
+import com.danamon.persistence.repository.CompanyRepository;
 import com.danamon.persistence.repository.TransactionDetailRepository;
 import com.danamon.service.GenerateFileExcelService;
 import com.danamon.utils.DateUtil;
 import com.danamon.vo.DetailInformationVO;
 import lombok.extern.slf4j.Slf4j;
+import opennlp.tools.namefind.NameFinderME;
+import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.tokenize.SimpleTokenizer;
+import opennlp.tools.util.Span;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.*;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 @Slf4j
-public class GenerateFileExcelServiceImpl implements GenerateFileExcelService {
+public class GenerateFileExcelServiceImpl extends AbstractBaseService implements GenerateFileExcelService {
     private final TransactionDetailRepository transactionDetailRepository;
+    private final CompanyRepository companyRepository;
     private static final String SETORAN = "SETORAN";
     private static final String SETORAN_TUNAI = "SETORAN TUNAI";
     private static final String SETORAN_VIA = "SETORAN VIA";
     private static final String TARIKAN = "TARIKAN";
     private static final String TOLAKAN_KLIRING = "TOLAKAN KLIRING";
+    private static final String BIAYA_ADM = "BIAYA ADM";
+    private static final String CR_KOREKSI_BUNGA = "CR KOREKSI BUNGA";
+    private static final String BUNGA = "BUNGA";
+    private static final String PAJAK_BUNGA = "PAJAK BUNGA";
+    private static final String SALDO_AWAL = "SALDO AWAL";
 
     @Autowired
-    public GenerateFileExcelServiceImpl(TransactionDetailRepository transactionDetailRepository) {
+    public GenerateFileExcelServiceImpl(TransactionDetailRepository transactionDetailRepository,
+                                        CompanyRepository companyRepository) {
         this.transactionDetailRepository = transactionDetailRepository;
+        this.companyRepository = companyRepository;
     }
 
     @Override
@@ -508,9 +526,9 @@ public class GenerateFileExcelServiceImpl implements GenerateFileExcelService {
     }
 
     @Override
-    public void generateTransactionDetail(Sheet sheet, List<TransactionDetail> transactionDetails, Workbook workbook) {
+    public void generateTransactionDetail(Sheet sheet, List<TransactionDetail> transactionDetails, Workbook workbook, CustomerInformation customerInformation) {
         headerSheetTransactionDetail(sheet);
-        valueSheetTransactionDetail(sheet, transactionDetails, workbook);
+        valueSheetTransactionDetail(sheet, transactionDetails, workbook, customerInformation);
     }
 
     private Row headerSheetTransactionDetail(Sheet sheet) {
@@ -526,7 +544,7 @@ public class GenerateFileExcelServiceImpl implements GenerateFileExcelService {
         return header;
     }
 
-    private void valueSheetTransactionDetail(Sheet sheet, List<TransactionDetail> transactionDetailList, Workbook workbook) {
+    private void valueSheetTransactionDetail(Sheet sheet, List<TransactionDetail> transactionDetailList, Workbook workbook, CustomerInformation customerInformation) {
         int firstRow = 1;
         DataFormat format = workbook.createDataFormat();
         CellStyle styleNumber = workbook.createCellStyle();
@@ -537,7 +555,48 @@ public class GenerateFileExcelServiceImpl implements GenerateFileExcelService {
             Cell tanggalCell = row.createCell(0, 1);
             tanggalCell.setCellValue(DateUtil.formatDateToString(transactionDetail.getTanggalTransaksi(), DateUtil.DATE_PATTERN2));
             Cell keteranganCell = row.createCell(1, 1);
-            keteranganCell.setCellValue(transactionDetail.getKeterangan() == null ? "" : transactionDetail.getKeterangan().replace("|"," "));
+            if(transactionDetail.getKeterangan() != null){
+                keteranganCell.setCellValue(transactionDetail.getKeterangan().replace("|"," "));
+                Cell klasification1Cell = row.createCell(6, 1);
+                Cell klasification2Cell = row.createCell(7, 1);
+
+                String[] split = transactionDetail.getKeterangan().split("\\|");
+                String namePT = "";
+                for (String o : split){
+                    namePT = o;
+                }
+                log.info("name : {}", namePT);
+
+                String[] nameSplit = customerInformation.getNama().split(" ");
+                String name = nameSplit[0];
+                if (nameSplit.length > 1) name = name + " " + nameSplit[1];
+
+                if(customerInformation.getNama().toUpperCase().contains(namePT.toUpperCase())){
+                    klasification1Cell.setCellValue(customerInformation.getNama());
+                    klasification2Cell.setCellValue("Self");
+                }else if(transactionDetail.getKeterangan().toUpperCase().contains(TARIKAN) || transactionDetail.getKeterangan().toUpperCase().contains(SETORAN)){
+                    klasification2Cell.setCellValue(transactionDetail.getKeterangan().replace("|"," "));
+                }else if(namePT.toUpperCase().equalsIgnoreCase(BIAYA_ADM)
+                        || namePT.toUpperCase().equalsIgnoreCase(CR_KOREKSI_BUNGA)
+                        || namePT.toUpperCase().equalsIgnoreCase(BUNGA)
+                        || namePT.toUpperCase().equalsIgnoreCase(PAJAK_BUNGA)
+                        || namePT.toUpperCase().equalsIgnoreCase(SALDO_AWAL)
+                        || transactionDetail.getKeterangan().toUpperCase().contains("KR OTOMATIS"))
+                {
+
+                }else if(transactionDetail.getKeterangan().toUpperCase().contains("PENERIMAAN NEGARA")){
+                    klasification2Cell.setCellValue("PENERIMAAN NEGARA");
+                }else {
+                    List<Company> companyList = companyRepository.findByPerusahaanLikeIgnoreCase(convertToLikeQuery(namePT));
+                    if(!companyList.isEmpty()) {
+                        klasification1Cell.setCellValue(companyList.get(0).getPerusahaan());
+                        klasification2Cell.setCellValue("Company");
+                    }else{
+                        klasification1Cell.setCellValue(namePT);
+                        klasification2Cell.setCellValue("Person");
+                    }
+                }
+            }
             Cell cbgCell = row.createCell(2, 1);
             if(transactionDetail.getCbg() != null) cbgCell.setCellValue(transactionDetail.getCbg());
             Cell debetCell = row.createCell(3, 1);
@@ -550,7 +609,15 @@ public class GenerateFileExcelServiceImpl implements GenerateFileExcelService {
             saldoCell.setCellStyle(styleNumber);
             if(transactionDetail.getSaldo() != null) saldoCell.setCellValue(Long.valueOf(transactionDetail.getSaldo().longValue()));
             firstRow += 1;
+
         }
+    }
+
+    private void download(String url, File destination) throws IOException {
+        URL website = new URL(url);
+        ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+        FileOutputStream fos = new FileOutputStream(destination);
+        fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
     }
 
     @Override

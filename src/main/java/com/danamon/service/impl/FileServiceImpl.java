@@ -112,7 +112,7 @@ public class FileServiceImpl implements FileService {
                     autoSizeColumns(workbook.getSheetAt(i), 20);
                 }
                 if(workbook.getSheetAt(i).getSheetName().equalsIgnoreCase(SheetNameEnum.TRANSACTION_DETAIL.getInternalValue())){
-                    generateFileExcelService.generateTransactionDetail(workbook.getSheetAt(i),transactionDetailList, workbook);
+                    generateFileExcelService.generateTransactionDetail(workbook.getSheetAt(i),transactionDetailList, workbook, transactionHeaders.get(0).getCustomerInformation());
                     autoSizeColumns(workbook.getSheetAt(i), 20);
                 }
                 if(workbook.getSheetAt(i).getSheetName().equalsIgnoreCase(SheetNameEnum.WINDOW_DRESSING.getInternalValue())){

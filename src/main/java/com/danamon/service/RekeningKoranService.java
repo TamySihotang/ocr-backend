@@ -9,4 +9,5 @@ import java.util.Set;
 
 public interface RekeningKoranService {
     ResponseEntity convertReportRekening(Bank bank, Set<MultipartFile> file) throws IOException;
+    boolean uploadCompany(MultipartFile file);
 }

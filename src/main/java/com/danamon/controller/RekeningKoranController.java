@@ -31,4 +31,16 @@ public class RekeningKoranController {
                                                @RequestParam(value = "bank") Bank bank) throws IOException{
         return rekeningKoranService.convertReportRekening(bank, file);
     }
+
+    @PostMapping(value = "/upload-company", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ResultVO> uploadFile(@RequestParam("file") MultipartFile file)
+                                               throws IOException{
+        AbstractRequestHandler handler = new AbstractRequestHandler() {
+            @Override
+            public Object processRequest() {
+                return rekeningKoranService.uploadCompany(file);
+            }
+        };
+        return handler.getResult();
+    }
 }
